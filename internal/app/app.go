@@ -18,7 +18,6 @@ func NewServer() *Server {
 	server.setupRoutes()
 
 	return server
-
 }
 
 func (s *Server) setupRoutes() {
