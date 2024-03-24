@@ -1,15 +1,13 @@
 package app
 
 import (
-	"io"
+	"net/http"
 
 	v1 "github.com/achintya-7/go-template-server/internal/controller/v1"
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
 )
 
 type Server struct {
-	router *gin.Engine
+	router *http.ServeMux
 }
 
 func NewServer() *Server {
@@ -21,23 +19,25 @@ func NewServer() *Server {
 }
 
 func (s *Server) setupRoutes() {
-	router := gin.Default()
 
-	baseRouter := router.Group("/service-name")
+	router := http.NewServeMux()
 
-	// disable gin logs
-	gin.DefaultWriter = io.Discard
-	// disable debug logs
-	gin.SetMode(gin.ReleaseMode)
+	router.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("pong"))
+	})
 
-	// register all v1 routes
 	v1Router := v1.NewRouter()
-	v1Router.SetupRoutes(baseRouter)
-
-	router.Use(cors.New(cors.Config{
-		AllowAllOrigins: true,
-		AllowHeaders:    []string{"*"},
-	}))
+	v1Router.SetupRoutes(router)
 
 	s.router = router
+
+}
+
+func (s *Server) Start(port string) error {
+	server := http.Server{
+		Addr:    port,
+		Handler: s.router,
+	}
+
+	return server.ListenAndServe()
 }
