@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"fmt"
 	"net/http/httptest"
 	"os"
 	"testing"
@@ -11,19 +10,6 @@ import (
 
 // This file should contain functions to start a Test and
 // various functions to be repetited in the testing process
-
-func newTestServer() *RouteHandler {
-	testRouteHanlder := NewRouteHandler()
-
-	return testRouteHanlder
-}
-
-func handlePanic() {
-	if r := recover(); r != nil {
-		fmt.Println("Panic in tests: ", r)
-	}
-}
-
 func createTestContext() (*gin.Context, *httptest.ResponseRecorder) {
 	gin.SetMode(gin.TestMode)
 	recorder := httptest.NewRecorder()

@@ -9,14 +9,12 @@ type ApiResponse struct {
 
 // ApiError is a standard error response from the service.
 type ApiError struct {
-	Code           int    `json:"code"`
 	Message        string `json:"message"`
 	HttpStatusCode int
 }
 
 // ErrorResponse is a standard error response from handler methods.
 type ErrorResponse struct {
-	Code           int
 	Message        string
 	HttpStatusCode int
 }

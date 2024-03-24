@@ -8,15 +8,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// HandlerFunction is the type of handler function callback.
 type HandlerFunction[T any] func(*gin.Context) (*T, *dto.ErrorResponse)
 
-// HandlerWrapper is a wrapper around all the handler methods.
-// Only this method will handle the response creation (i.e., ctx.JSON).
-// All the handler methods in this wrapper should return a pair of values:
-// 1. Result computed (which can be of any type)
-// 2. A pointer to ErrorResponse
-func HandlerWrapper[T any](callback HandlerFunction[T]) func(ctx *gin.Context) {
+func HandleWrapper[T any](callback HandlerFunction[T]) func(ctx *gin.Context) {
 	return func(ctx *gin.Context) {
 		defer handlePanic(ctx)
 
@@ -34,7 +28,6 @@ func handlePanic(ctx *gin.Context) {
 	if r := recover(); r != nil {
 		// logger to send error
 		sendErrorResponse(ctx, &dto.ErrorResponse{
-			Code:           http.StatusInternalServerError,
 			Message:        "Internal Server Error",
 			HttpStatusCode: http.StatusInternalServerError,
 		})
@@ -46,7 +39,6 @@ func sendErrorResponse(ctx *gin.Context, err *dto.ErrorResponse) {
 		Status: false,
 		Data:   nil,
 		Error: &dto.ApiError{
-			Code:           err.Code,
 			Message:        err.Message,
 			HttpStatusCode: err.HttpStatusCode,
 		},
@@ -70,7 +62,6 @@ func sendNotFoundResponse(ctx *gin.Context) {
 		Status: false,
 		Data:   nil,
 		Error: &dto.ApiError{
-			Code:           http.StatusNotFound,
 			Message:        "Oops! No data found",
 			HttpStatusCode: http.StatusNotFound,
 		},

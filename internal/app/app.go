@@ -1,18 +1,21 @@
 package app
 
 import (
-	"io"
-
 	v1 "github.com/achintya-7/go-template-server/internal/controller/v1"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
+type ServerInterface interface {
+	run(port string) error
+	setupRoutes()
+}
+
 type Server struct {
 	router *gin.Engine
 }
 
-func NewServer() *Server {
+func NewServer() ServerInterface {
 	server := &Server{}
 
 	server.setupRoutes()
@@ -25,13 +28,8 @@ func (s *Server) setupRoutes() {
 
 	baseRouter := router.Group("/service-name")
 
-	// disable gin logs
-	gin.DefaultWriter = io.Discard
-	// disable debug logs
-	gin.SetMode(gin.ReleaseMode)
-
 	// register all v1 routes
-	v1Router := v1.NewRouter()
+	v1Router := v1.NewRouter(baseRouter)
 	v1Router.SetupRoutes(baseRouter)
 
 	router.Use(cors.New(cors.Config{
@@ -40,4 +38,8 @@ func (s *Server) setupRoutes() {
 	}))
 
 	s.router = router
+}
+
+func (s *Server) run(port string) error {
+	return s.router.Run(port)
 }
