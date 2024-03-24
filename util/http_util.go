@@ -25,7 +25,6 @@ func HttpHandlerWrapper[T any](callback HttpHandlerFunction[T]) func(http.Respon
 func handlePanicV2(w http.ResponseWriter) {
 	if r := recover(); r != nil {
 		sendErrorResponseV2(w, &dto.ErrorResponse{
-			Code:           http.StatusInternalServerError,
 			Message:        "Internal Server Error",
 			HttpStatusCode: http.StatusInternalServerError,
 		})
@@ -52,7 +51,6 @@ func sendSuccessResponseV2[T any](w http.ResponseWriter, result *T) {
 	resultBytes, err := json.Marshal(data)
 	if err != nil {
 		sendErrorResponseV2(w, &dto.ErrorResponse{
-			Code:           http.StatusInternalServerError,
 			Message:        "Internal Server Error",
 			HttpStatusCode: http.StatusInternalServerError,
 		})
