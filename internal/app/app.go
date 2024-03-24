@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	v1 "github.com/achintya-7/go-template-server/internal/controller/v1"
+	v2 "github.com/achintya-7/go-template-server/internal/controller/v2"
 )
 
 type Server struct {
@@ -26,8 +27,25 @@ func (s *Server) setupRoutes() {
 		w.Write([]byte("pong"))
 	})
 
-	v1Router := v1.NewRouter()
-	v1Router.SetupRoutes(router)
+	// v1 routes
+	v1ServeMux := http.NewServeMux()
+	v1Router := v1.NewRouter(v1ServeMux)
+	middlewareStack := v1Router.SetupRoutes()
+	if middlewareStack != nil {
+		router.Handle("/v1/", middlewareStack(http.StripPrefix("/v1", v1ServeMux)))
+	} else {
+		router.Handle("/v1/", http.StripPrefix("/v1", v1ServeMux))
+	}
+
+	// v2 routes
+	v2ServeMux := http.NewServeMux()
+	v2Router := v2.NewRouter(v2ServeMux)
+	middlewareStack = v2Router.SetupRoutes()
+	if middlewareStack != nil {
+		router.Handle("/v2/", http.StripPrefix("/v2", middlewareStack(v2ServeMux)))
+	} else {
+		router.Handle("/v2/", http.StripPrefix("/v2", v2ServeMux))
+	}
 
 	s.router = router
 

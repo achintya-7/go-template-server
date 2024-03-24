@@ -1,5 +1,5 @@
 # Go Template Server
-A template server for go projects using Gin
+A template server for go projects using pure net/http package *[Requires Go version 1.22+]*
 
 ## Usage
 * Click the `Use this template` button to create a new repository using this template
